@@ -1,0 +1,52 @@
+#include "vxWorks.h"
+#include "semLib.h"
+#include<stdio.h>
+SEM_ID s1,s2;
+int x,y;
+int tid1,tid2;
+
+
+void task2 ()
+{
+	printf("am task 2 \n");
+	printf("Task id = %d\n",taskIdSelf());
+	semTake (s2, WAIT_FOREVER);
+	printf("got access to y\n");
+	y=15;
+	printf("y = %d\n",y);
+	semTake (s1, WAIT_FOREVER);
+	printf("Task id = %d\n",taskIdSelf());
+	printf ("Task1A: Released mutual-exclusion semaphore\n");
+	x=11;
+	printf("Task 2 x value = %d\n",x);
+	semGive (s1);
+	semGive (s2);
+	
+}
+
+void task1 ()
+{
+	printf("Task id = %d\n",taskIdSelf());
+	semTake (s1, WAIT_FOREVER);
+	printf("Task id = %d\n",taskIdSelf());
+	printf ("TaskA: Got mutual-exclusion semaphore for x\n");
+  	/*---task 2 higher priority -----*/
+	x = 10;
+	printf("creating task 2\n");
+	tid2= taskSpawn("task2",100,0,512,(void *)task2,0,0,0,0,0,0,0,0,0,0);
+	semTake (s2, WAIT_FOREVER);
+	printf("Task1 x value = %d\n",x);
+	semGive (s1);
+	semGive (s2);
+}
+
+
+/* Create a mutual-exclusion semaphore. */
+void root ()
+{
+	s1= semMCreate (SEM_Q_PRIORITY);
+	s2= semMCreate (SEM_Q_PRIORITY);
+	printf("Im going to create task \n");
+	tid1 = taskSpawn("task1",106,0,512,(void *)task1,0,0,0,0,0,0,0,0,0,0);
+	return;
+}

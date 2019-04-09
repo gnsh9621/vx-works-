@@ -1,0 +1,48 @@
+#include "vxWorks.h"
+#include<string.h>
+#include<taskLib.h>
+#include<stdio.h>
+#include<ioLib.h>
+#include<pipeDrv.h> 
+
+int x;
+int tid1,tid2;
+
+
+void task1 ()
+{
+	int fd,m;
+	char buf[20];
+	printf("Task id = %d\n",taskIdSelf());
+	fd = open("/pipe/mypipe",O_RDONLY,0);
+	printf("am waiting for the message \n");
+	m = read(fd,buf,20);
+	buf[m] = '\0';
+	printf("%s\n",buf);
+	close(fd);
+}
+void task2 ()
+{
+	int fd2;
+	char str[30]= "HELLO";
+	printf("am task 2 with lower priority \n");
+	printf("Task id = %d\n",taskIdSelf());
+	fd2 = open("/pipe/mypipe",O_WRONLY,0);
+	printf("am writing the message \n");
+	write(fd2,str,strlen(str));
+	close(fd2);
+		
+}
+
+/* Create a binary semaphore. */
+void root ()
+{
+	int sta1;
+	pipeDrv();
+	sta1= pipeDevCreate("/pipe/mypipe",5,50);
+   	printf("Im going to create task \n");
+	tid1 = taskSpawn("task1",100,0,512,(void *)task1,0,0,0,0,0,0,0,0,0,0);
+	printf("creating task 2\n");
+	tid2= taskSpawn("task2",106,0,512,(void *)task2,0,0,0,0,0,0,0,0,0,0);
+	return;
+}

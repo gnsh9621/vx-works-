@@ -1,0 +1,31 @@
+#include<stdio.h>
+#include<taskLib.h>
+void task2()
+{
+	printf("am task2 with l priority\n");
+} 
+void task3()
+{
+	printf("am task3 with m priority\n");
+} 
+
+
+void task1()
+{
+	int tid2,tid3;
+	printf("task1 with high priority\n");
+	tid2= taskSpawn("task2",106,0,512,(void *)task2,0,0,0,0,0,0,0,0,0,0);
+	tid3= taskSpawn("task3",102,0,512,(void *)task3,0,0,0,0,0,0,0,0,0,0);
+	
+}
+
+
+void root()
+{
+	int tid1,tid2;
+	printf("*********************\n");
+	printf("Im going to create task \n");
+	tid1 = taskSpawn("task1",100,0,512,(void *)task1,0,0,0,0,0,0,0,0,0,0);
+	printf("creating task1 \n");
+	return;
+}

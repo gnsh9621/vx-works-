@@ -1,0 +1,38 @@
+#include<stdio.h>
+#include<taskLib.h>
+int tid1,tid2;
+void task2()
+{
+	int tidtemp,sta1;
+	int i =0;
+	printf("\nTask 2*********************\n");
+	tidtemp = taskNameToId("task1");
+	sta1 = taskDelete(tidtemp);
+	if(sta1 == OK)
+		printf("%d deleted \n",sta1); 
+} 
+
+void task1()
+{
+	int i =0;
+	taskLock();
+	taskSafe(); 
+	printf("HP task is blocked \n");
+	printf("Im going to create 2nd tasks \n");
+	tid2= taskSpawn("task2",102,0,512,(void *)task2,0,0,0,0,0,0,0,0,0,0);
+	while(i<1000)
+		i++;
+	printf("task is unlocked :( \n");
+	taskUnlock();
+	i=0;
+	while(i<1000)
+		i++;
+	printf("i = %d\n",i);
+}
+void root()
+{
+	printf("*********************\n");
+	printf("Im going to create 1 tasks \n");
+	tid1 = taskSpawn("task1",103,0,512,(void *)task1,0,0,0,0,0,0,0,0,0,0);
+	return;
+}

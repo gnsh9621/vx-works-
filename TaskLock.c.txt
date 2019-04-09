@@ -1,0 +1,31 @@
+#include<stdio.h>
+#include<taskLib.h>
+void task2()
+{
+	printf("im task2\n");
+	printf("Task id = %d\n",taskIdSelf());
+	printf("Task 2: am awake \n");
+
+	
+}
+void task1()
+{
+	int tid2;
+	printf("im task1\n");
+	printf("Task id = %d\n",taskIdSelf()); 
+	printf("creating task2 \n");
+	taskLock();
+	tid2= taskSpawn("task2",100,0,512,(void *)task2,0,0,0,0,0,0,0,0,0,0);
+	printf("task1 is back !!");
+	printf("Task id = %d\n",taskIdSelf());
+	return;
+	
+}
+
+void root()
+{
+	int tid1;
+	printf("Im going to create a task \n");
+	tid1 = taskSpawn("task1",101,0,512,(void *)task1,0,0,0,0,0,0,0,0,0,0);
+	return;
+}

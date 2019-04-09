@@ -1,0 +1,38 @@
+#include<stdio.h>
+#include<taskLib.h>
+#include<msgQLib.h>
+MSG_Q_ID msgid;
+int tid2,tid1;
+void task2()
+{
+	char buf[30];
+	int b;
+	printf("am receiving task\n");
+	printf("am waiting for the message\n");
+	b = msgQReceive(msgid,buf,100,WAIT_FOREVER );
+	buf[b] = '\0';
+	printf("message is = %s\n",buf);
+} 
+void task1()
+{
+	char str[20]="HELLO WORLD";
+	printf("am sending task\n");
+	printf("am sending the message\n");
+	msgQSend(msgid,str,20,WAIT_FOREVER,MSG_PRI_NORMAL);
+	printf("task1 sent\n");
+	
+}
+
+
+void root()
+{
+
+	printf("*********************\n");
+	printf("going to create a message queue\n");
+	msgid = msgQCreate(3,20,MSG_Q_FIFO );
+	printf("Im going to create task \n");
+	tid1 = taskSpawn("task1",106,0,512,(void *)task1,0,0,0,0,0,0,0,0,0,0);
+	tid2= taskSpawn("task2",100,0,512,(void *)task2,0,0,0,0,0,0,0,0,0,0);
+	printf("creating task1 \n");
+	return;
+}
